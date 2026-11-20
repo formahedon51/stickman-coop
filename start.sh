@@ -105,7 +105,14 @@ if [ -n "$PUBLIC_URL" ] && [ "$PUBLIC_OK" = "1" ] && [ -d "$DIR/.git" ]; then
 import json, sys, urllib.parse, time
 url, out = sys.argv[1], sys.argv[2]
 u = urllib.parse.urlparse(url)
-data = {"signals": [{"host": u.hostname, "port": 443, "path": "/peerjs", "secure": True}], "updated": int(time.time())}
+signals = [{"host": u.hostname, "port": 443, "path": "/peerjs", "secure": True}]
+old = {}
+try:
+    old = json.load(open(out, encoding="utf-8"))
+except Exception:
+    pass
+updated = old.get("updated", int(time.time())) if old.get("signals") == signals else int(time.time())
+data = {"signals": signals, "updated": updated}
 open(out, "w", encoding="utf-8").write(json.dumps(data, ensure_ascii=False, indent=2))
 PY
   if git -C "$DIR" add public/servers.json 2>/dev/null; then
