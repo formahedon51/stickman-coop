@@ -99,6 +99,23 @@ if [ "$TUNNEL" = "1" ]; then
   fi
 fi
 
+# ---------- публикуем адрес signaling для GitHub Pages ----------
+if [ -n "$PUBLIC_URL" ] && [ "$PUBLIC_OK" = "1" ] && [ -d "$DIR/.git" ]; then
+  python3 - "$PUBLIC_URL" "$DIR/public/servers.json" <<'PY'
+import json, sys, urllib.parse, time
+url, out = sys.argv[1], sys.argv[2]
+u = urllib.parse.urlparse(url)
+data = {"signals": [{"host": u.hostname, "port": 443, "path": "/peerjs", "secure": True}], "updated": int(time.time())}
+open(out, "w", encoding="utf-8").write(json.dumps(data, ensure_ascii=False, indent=2))
+PY
+  if git -C "$DIR" add public/servers.json 2>/dev/null; then
+    if ! git -C "$DIR" diff --cached --quiet 2>/dev/null; then
+      git -C "$DIR" commit -q -m "Update public signaling URL" 2>/dev/null || true
+      git -C "$DIR" push -q origin main 2>/dev/null || true
+    fi
+  fi
+fi
+
 # ---------- что открыть ----------
 if [ -n "$PUBLIC_URL" ]; then
   if [ "$PUBLIC_OK" = "1" ]; then

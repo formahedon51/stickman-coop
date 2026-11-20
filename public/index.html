@@ -77,6 +77,7 @@ body{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#c9d
 .hint{font-size:11px;opacity:.45;letter-spacing:.5px;max-width:560px;line-height:1.7}
 .hint.ok{color:#4affa0;opacity:.8}
 .hint.warn{color:#ffd54f;opacity:.8}
+#browserWarn{border:1px solid rgba(255,213,79,.5);background:rgba(255,213,79,.08);color:#ffd54f;padding:10px 14px;border-radius:8px;max-width:520px;font-size:12px;line-height:1.7;letter-spacing:.4px;text-align:left}
 .share{font-size:12px;opacity:.8;letter-spacing:.4px;word-break:break-all;max-width:540px;color:#8fd0ff;user-select:all}
 
 /* tutorial */
@@ -173,6 +174,7 @@ body{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#c9d
   <div class="config"><label>КОД КОМНАТЫ <input type="text" id="codeInput" placeholder="XXXXXX" maxlength="6"></label></div>
   <div class="btnrow"><button id="btnJoin" class="alt">ВОЙТИ ПО КОДУ</button></div>
   <div id="menuStatus"></div>
+  <div id="browserWarn" class="hidden"></div>
   <div id="serverStatus" class="hint">Проверяем локальный сервер…</div>
   <div class="hint">Сигналинг: локальный сервер, если он запущен, иначе публичный PeerJS.</div>
 </div>
@@ -1356,6 +1358,39 @@ function localSignalServer(){
 /* Локальный сервер учитываем только если /api/status реально ответил.
    На GitHub Pages его нет — сразу идём на публичный PeerJS. */
 function signalServers(){return SIGNAL_SERVERS.filter(s=>!s._local||localServerOk);}
+
+/* Встроенные браузеры VK/Telegram/Instagram часто режут WebSocket/WebRTC. */
+const IN_APP=/VKClient|VKAndroid|VKiOS|VKApp|Telegram|Instagram|FBAN|FBAV|Line\/|WhatsApp|Snapchat/i.test(navigator.userAgent||'');
+if(IN_APP){
+  const w=$('browserWarn');
+  if(w){
+    w.textContent='Похоже, вы открыли игру во встроенном браузере (VK/Telegram/Instagram). Он часто блокирует WebSocket/WebRTC. Откройте ссылку в Chrome или Safari: меню «…» → «Открыть в браузере».';
+    w.classList.remove('hidden');
+  }
+}
+/* Публичный адрес signaling с ноутбука (public/servers.json).
+   На GitHub Pages он становится первым — публичный PeerJS только запасной. */
+function loadExtraServer(){
+  fetch('servers.json',{cache:'no-store'})
+    .then(r=>r.ok?r.json():null)
+    .then(d=>{
+      if(!d||!Array.isArray(d.signals))return;
+      let insertAt=0;
+      const localIdx=SIGNAL_SERVERS.findIndex(x=>x._local);
+      if(localIdx>=0)insertAt=localIdx+1;
+      for(const s of d.signals){
+        if(!s||!s.host)continue;
+        if(SIGNAL_SERVERS.some(x=>x.host===s.host&&x.port===s.port&&x.path===s.path))continue;
+        SIGNAL_SERVERS.splice(insertAt++,0,{...s,_extra:true,timeout:4000});
+      }
+    })
+    .catch(()=>{});
+}
+loadExtraServer();
+function allServersFailedText(){
+  return (IN_APP?'Вы во встроенном браузере — откройте ссылку в Chrome или Safari. ':'')+
+    'Все серверы не отвечают. Попробуйте VPN или позже.';
+}
 /* STUN/TURN: несколько независимых бесплатных провайдеров + OpenRelay TURN. */
 const ICE_SERVERS=[
   {urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302','stun:stun2.l.google.com:19302','stun:stun3.l.google.com:19302']},
@@ -1608,11 +1643,12 @@ function tryCreateHost(serverIndex){
   destroyPeer();
   const servers=signalServers();
   if(serverIndex>=servers.length){
-    setMenuStatus('Все серверы недоступны. Попробуй VPN или позже.',true);
+    setMenuStatus(allServersFailedText(),true);
     peerBusy=false;setupPhase='idle';return;
   }
   const signal=servers[serverIndex];
   signalServerIndex=serverIndex;
+  const connectMs=signal.timeout||CONNECT_TIMEOUT;
   const p=new Peer('sf-'+genCode(),{...PEER_CONFIG,host:signal.host,port:signal.port,path:signal.path,secure:signal.secure});
   peer=p;
   currentRoomCode=p.id.slice(3);
@@ -1622,8 +1658,8 @@ function tryCreateHost(serverIndex){
     if(settled||peer!==p)return;
     settled=true;
     if(serverIndex<servers.length-1)tryCreateHost(serverIndex+1);
-    else{setMenuStatus('Все серверы не отвечают.',true);peerBusy=false;setupPhase='idle';destroyPeer();}
-  },CONNECT_TIMEOUT);
+    else{setMenuStatus(allServersFailedText(),true);peerBusy=false;setupPhase='idle';destroyPeer();}
+  },connectMs);
   if(serverIndex===0)setMenuStatus('Регистрируем комнату…');
   else setMenuStatus(`Попытка ${serverIndex+1}/${servers.length}…`,'warn');
   p.on('open',()=>{
@@ -1666,11 +1702,12 @@ function tryJoinHost(serverIndex){
   destroyPeer();
   const servers=signalServers();
   if(serverIndex>=servers.length){
-    setMenuStatus('Все серверы недоступны. Попробуй VPN или позже.',true);
+    setMenuStatus(allServersFailedText(),true);
     peerBusy=false;setupPhase='idle';return;
   }
   const signal=servers[serverIndex];
   signalServerIndex=serverIndex;
+  const connectMs=signal.timeout||CONNECT_TIMEOUT;
   const p=new Peer({...PEER_CONFIG,host:signal.host,port:signal.port,path:signal.path,secure:signal.secure});
   peer=p;
   setupPhase='opening';
@@ -1679,8 +1716,8 @@ function tryJoinHost(serverIndex){
     if(settled||peer!==p)return;
     settled=true;
     if(serverIndex<servers.length-1)tryJoinHost(serverIndex+1);
-    else{setMenuStatus('Все серверы не отвечают.',true);peerBusy=false;setupPhase='idle';destroyPeer();}
-  },CONNECT_TIMEOUT);
+    else{setMenuStatus(allServersFailedText(),true);peerBusy=false;setupPhase='idle';destroyPeer();}
+  },connectMs);
   if(serverIndex===0)setMenuStatus('Получаем ID от сервера…');
   else setMenuStatus(`Попытка ${serverIndex+1}/${servers.length}…`,'warn');
   p.on('open',()=>{

@@ -1,0 +1,11 @@
+{
+  "signals": [
+    {
+      "host": "dispatched-honor-missed-cast.trycloudflare.com",
+      "port": 443,
+      "path": "/peerjs",
+      "secure": true
+    }
+  ],
+  "updated": 1795209033
+}
