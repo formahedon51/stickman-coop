@@ -1,0 +1,15 @@
+{
+  "name": "stickman-coop-server",
+  "version": "2.0.0",
+  "private": true,
+  "description": "STICKMAN CO-OP: локальный сервер (игра + PeerJS signaling)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.3.0",
+    "peer": "^1.0.2"
+  }
+}

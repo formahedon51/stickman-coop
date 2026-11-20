@@ -1,0 +1,8 @@
+node_modules/
+bin/
+logs/
+*.pid
+server.pid
+tunnel.pid
+.env
+.DS_Store
