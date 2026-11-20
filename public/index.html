@@ -1381,7 +1381,7 @@ function loadExtraServer(){
       for(const s of d.signals){
         if(!s||!s.host)continue;
         if(SIGNAL_SERVERS.some(x=>x.host===s.host&&x.port===s.port&&x.path===s.path))continue;
-        SIGNAL_SERVERS.splice(insertAt++,0,{...s,_extra:true,timeout:4000});
+        SIGNAL_SERVERS.splice(insertAt++,0,{...s,_extra:true,timeout:10000});
       }
       if(!serverInfo){
         const el=$('serverStatus');
