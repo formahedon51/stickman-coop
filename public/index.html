@@ -1454,15 +1454,20 @@ function updateServerStatus(s){
   updateShareLink();
 }
 function refreshServerInfo(){
-  fetch('/api/status',{cache:'no-store'})
+  fetch('api/status',{cache:'no-store'})
     .then(r=>r.ok?r.json():null)
     .then(s=>updateServerStatus(s))
     .catch(()=>updateServerStatus(null));
 }
-refreshServerInfo();
-// Публичная ссылка может появиться позже (туннель поднимается ~20 c) —
-// обновляем статус и ссылку в лобби каждые 10 секунд.
-setInterval(refreshServerInfo,10000);
+// На GitHub Pages локального сервера нет — не дёргаем /api/status.
+// На ноутбуке опрашиваем статус, чтобы поймать появление публичной ссылки.
+const isGitHubPages=/\.github\.io$/i.test(location.hostname);
+if(isGitHubPages){
+  updateServerStatus(null);
+}else{
+  refreshServerInfo();
+  setInterval(refreshServerInfo,10000);
+}
 function copyText(text){
   if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(text).then(()=>true).catch(()=>false);
   return Promise.resolve(false);
