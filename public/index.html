@@ -176,7 +176,7 @@ body{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#c9d
   <div id="menuStatus"></div>
   <div id="browserWarn" class="hidden"></div>
   <div id="serverStatus" class="hint">Проверяем локальный сервер…</div>
-  <div class="hint">Сигналинг: локальный сервер, если он запущен, иначе публичный PeerJS.</div>
+  <div class="hint">Сигналинг: сервер ноутбука (локально или через туннель), иначе публичный PeerJS.</div>
 </div>
 
 <!-- ================= LOBBY ================= -->
@@ -1383,13 +1383,17 @@ function loadExtraServer(){
         if(SIGNAL_SERVERS.some(x=>x.host===s.host&&x.port===s.port&&x.path===s.path))continue;
         SIGNAL_SERVERS.splice(insertAt++,0,{...s,_extra:true,timeout:4000});
       }
+      if(!serverInfo){
+        const el=$('serverStatus');
+        if(el){el.textContent='Сигналинг: сервер ноутбука через туннель (публичный PeerJS — запасной)';el.className='hint';}
+      }
     })
     .catch(()=>{});
 }
 loadExtraServer();
 function allServersFailedText(){
   return (IN_APP?'Вы во встроенном браузере — откройте ссылку в Chrome или Safari. ':'')+
-    'Все серверы не отвечают. Попробуйте VPN или позже.';
+    'Все серверы не отвечают. Нажмите кнопку ещё раз, попробуйте VPN или позже.';
 }
 /* STUN/TURN: несколько независимых бесплатных провайдеров + OpenRelay TURN. */
 const ICE_SERVERS=[
