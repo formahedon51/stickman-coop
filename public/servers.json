@@ -1,11 +1,11 @@
 {
   "signals": [
     {
-      "host": "address-indicators-personally-candy.trycloudflare.com",
+      "host": "pda-incidence-industry-hypothesis.trycloudflare.com",
       "port": 443,
       "path": "/peerjs/",
       "secure": true
     }
   ],
-  "updated": 1795325215
+  "updated": 1795326481
 }
