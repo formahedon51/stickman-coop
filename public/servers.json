@@ -1,11 +1,11 @@
 {
   "signals": [
     {
-      "host": "was-perfume-shipments-bite.trycloudflare.com",
+      "host": "stats-internationally-decorative-benjamin.trycloudflare.com",
       "port": 443,
       "path": "/peerjs/",
       "secure": true
     }
   ],
-  "updated": 1795332130
+  "updated": 1795336448
 }
