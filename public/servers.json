@@ -1,11 +1,11 @@
 {
   "signals": [
     {
-      "host": "aimed-diving-stack-provided.trycloudflare.com",
+      "host": "address-indicators-personally-candy.trycloudflare.com",
       "port": 443,
       "path": "/peerjs/",
       "secure": true
     }
   ],
-  "updated": 1795323850
+  "updated": 1795325215
 }
