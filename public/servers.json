@@ -1,11 +1,11 @@
 {
   "signals": [
     {
-      "host": "stats-internationally-decorative-benjamin.trycloudflare.com",
+      "host": "incentive-type-mechanism-ward.trycloudflare.com",
       "port": 443,
       "path": "/peerjs/",
       "secure": true
     }
   ],
-  "updated": 1795336448
+  "updated": 1795337613
 }
