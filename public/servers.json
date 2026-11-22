@@ -1,11 +1,11 @@
 {
   "signals": [
     {
-      "host": "dispatched-honor-missed-cast.trycloudflare.com",
+      "host": "aimed-diving-stack-provided.trycloudflare.com",
       "port": 443,
-      "path": "/peerjs",
+      "path": "/peerjs/",
       "secure": true
     }
   ],
-  "updated": 1795209538
+  "updated": 1795323850
 }
