@@ -1,11 +1,11 @@
 {
   "signals": [
     {
-      "host": "pda-incidence-industry-hypothesis.trycloudflare.com",
+      "host": "noon-robots-bring-welding.trycloudflare.com",
       "port": 443,
       "path": "/peerjs/",
       "secure": true
     }
   ],
-  "updated": 1795326481
+  "updated": 1795332093
 }
