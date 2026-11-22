@@ -1,11 +1,11 @@
 {
   "signals": [
     {
-      "host": "noon-robots-bring-welding.trycloudflare.com",
+      "host": "was-perfume-shipments-bite.trycloudflare.com",
       "port": 443,
       "path": "/peerjs/",
       "secure": true
     }
   ],
-  "updated": 1795332093
+  "updated": 1795332130
 }
