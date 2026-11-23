@@ -1,11 +1,11 @@
 {
   "signals": [
     {
-      "host": "incentive-type-mechanism-ward.trycloudflare.com",
+      "host": "sale-pct-simple-derby.trycloudflare.com",
       "port": 443,
       "path": "/peerjs/",
       "secure": true
     }
   ],
-  "updated": 1795337613
+  "updated": 1795407811
 }
